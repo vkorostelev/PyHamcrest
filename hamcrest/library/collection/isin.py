@@ -8,8 +8,8 @@ __license__ = "BSD, see License.txt"
 class IsIn(BaseMatcher):
 
     def __init__(self, sequence):
-        self.sequence = sequence
-
+        self.sequence = list(sequence)
+        
     def _matches(self, item):
         return item in self.sequence
 

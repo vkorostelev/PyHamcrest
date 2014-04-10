@@ -11,17 +11,20 @@ class IsEmpty(BaseMatcher):
         try:
             if len(item) == 0:
                 return True
-
-            if mismatch_description:
-                mismatch_description \
-                    .append_text('has %d item(s)' % len(item))
-
         except TypeError:
-            if mismatch_description:
-                mismatch_description \
-                    .append_text('does not support length')
+            pass
+            
+        self.describe_mismatch(item, mismatch_description)
+        return False
 
-            return False
+    def describe_mismatch(self, item, mismatch_description):
+        if not mismatch_description:
+            return
+            
+        try:
+            mismatch_description.append_text('has %d item(s)' % len(item))
+        except TypeError:
+            mismatch_description.append_text('does not support length')
 
     def describe_to(self, description):
         description.append_text('an empty collection')

@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
-from hamcrest.library.collection.is_empty import *
+from hamcrest.library.collection.is_empty import empty
 
 from hamcrest.core.tests.matcher_test import MatcherTest
-from .sequencemixin import GeneratorForm, SequenceForm
+import pytest
 
 __author__ = "Chris Rose"
 __copyright__ = "Copyright 2012 hamcrest.org"
@@ -48,3 +48,34 @@ class EmptyCollectionTest(MatcherTest):
     def testDescribeMismatch(self):
         self.assert_mismatch_description("has 3 item(s)", empty(), [1,2,3])
         self.assert_mismatch_description("does not support length", empty(), 1)
+
+
+@pytest.fixture
+def matcher():
+    return empty()
+
+
+@pytest.fixture(params=((), [], {}, LengthHaver(0)))
+def valid_value(request):
+    return request.param
+
+
+@pytest.fixture(params=((1,), [1], {1: 2}, LengthHaver(1), 1))
+def invalid_value(request):
+    return request.param
+
+
+@pytest.fixture
+def description():
+    return "an empty collection"
+
+
+@pytest.fixture
+def mismatch_description(invalid_value):
+    if invalid_value == 1:
+        return 'does not support length'
+    return 'has {0} item(s)'.format(len(invalid_value))
+
+
+from hamcrest.core.tests.generic_matcher_test import *
+

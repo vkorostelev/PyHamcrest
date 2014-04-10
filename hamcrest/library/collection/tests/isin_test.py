@@ -1,46 +1,43 @@
 from __future__ import absolute_import
 
-from hamcrest.library.collection.isin import *
-
-from hamcrest.core.tests.matcher_test import MatcherTest
-from .sequencemixin import GeneratorForm, SequenceForm
-import unittest
-
 __author__ = "Jon Reid"
 __copyright__ = "Copyright 2011 hamcrest.org"
 __license__ = "BSD, see License.txt"
 
+from hamcrest.core.string_description import tostring
+from hamcrest.library.collection.isin import is_in
 
-sequence = ('a', 'b', 'c')
-
-class IsInTestBase(object):
-
-    def testReturnsTrueIfArgumentIsInSequence(self):
-        matcher = is_in(self._sequence(*sequence))
-
-        self.assert_matches('has a', matcher, 'a')
-        self.assert_matches('has b', matcher, 'b')
-        self.assert_matches('has c', matcher, 'c')
-        self.assert_does_not_match('no d', matcher, 'd')
-
-    def testHasReadableDescription(self):
-        self.assert_description("one of ('a', 'b', 'c')", is_in(self._sequence(*sequence)))
-
-    def testSuccessfulMatchDoesNotGenerateMismatchDescription(self):
-        self.assert_no_mismatch_description(is_in(self._sequence(*sequence)), 'a')
-
-    def testMismatchDescriptionShowsActualArgument(self):
-        self.assert_mismatch_description("was 'bad'", is_in(self._sequence(*sequence)), 'bad')
-
-    def testDescribeMismatch(self):
-        self.assert_describe_mismatch("was 'bad'", is_in(self._sequence(*sequence)), 'bad')
+import pytest
 
 
-class IsInConcreteSequenceTest(MatcherTest, IsInTestBase, SequenceForm):
-    pass
+@pytest.fixture(params=[list, iter])
+def sequence(request):
+    return request.param(('a', 'b', 'c'))
 
-class IsInGeneratorTest(MatcherTest, IsInTestBase, GeneratorForm):
-    pass
+    
+@pytest.fixture
+def matcher(sequence):
+    return is_in(sequence)
 
-if __name__ == '__main__':
-    unittest.main()
+
+@pytest.fixture(params=('a', 'b', 'c'))
+def valid_value(request):
+    return request.param
+
+
+@pytest.fixture
+def description(matcher):
+    return "one of ('{0}')".format("', '".join(matcher.sequence))
+
+
+@pytest.fixture
+def mismatch_description(invalid_value):
+    return "was {0}".format(tostring(invalid_value))
+    
+
+@pytest.fixture(params=(1, object()))
+def invalid_value(request):
+    return request.param
+
+    
+from hamcrest.core.tests.generic_matcher_test import *
