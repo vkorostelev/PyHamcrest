@@ -1,3 +1,6 @@
+import inspect
+import itertools
+
 from hamcrest.core.string_description import StringDescription
 
 try:
@@ -38,17 +41,28 @@ class MatcherTest(unittest.TestCase):
 
 
 def assert_matches(matcher, arg, message):
+    if inspect.isgenerator(arg):
+        arg1, arg1_a, arg2, arg2_a = itertools.tee(arg, 4)
+    else:
+        arg1 = arg1_a = arg2 = arg2_a = arg
     try:
-        assert matcher.matches(arg), message
+        assert matcher.matches(arg1), message
     except AssertionError:
         description = StringDescription()
-        matcher.describe_mismatch(arg, description)
+        matcher.describe_mismatch(list(arg1_a), description)
         log.error(str(description))
         raise
-
+    assert matcher.eq == arg2, "The equality proxy had a mismatch; {0} != {1}".format(
+        matcher.eq, list(arg2_a))
+    
 
 def assert_does_not_match(matcher, arg, message):
-    assert not matcher.matches(arg), message
+    if inspect.isgenerator(arg):
+        arg1, arg2 = itertools.tee(arg, 2)
+    else:
+        arg1 = arg2 = arg
+    assert not matcher.matches(arg1), message
+    assert matcher.eq != arg2, "The equality proxy matched unexpectedly"
 
 
 def assert_description(expected, matcher):
