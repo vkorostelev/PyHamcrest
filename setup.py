@@ -39,7 +39,7 @@ params = dict(
     keywords='hamcrest matchers pyunit unit test testing unittest unittesting',
     url='https://github.com/hamcrest/PyHamcrest',
     download_url='http://pypi.python.org/packages/source/P/PyHamcrest/PyHamcrest-%s.tar.gz' % __version__,
-    packages=find_packages(exclude=('*.tests',)),
+    packages=find_packages(exclude=('*.tests', '*.conftest')),
     package_dir = {},
     provides=['hamcrest'],
     long_description=read('README.rst'),
@@ -64,5 +64,6 @@ params = dict(
     **extra_attributes
     )
 
+from pprint import pprint; pprint(params['packages']); sys.exit(0)
 all_params = dict(params.items(), **extra_attributes)
 setup(**all_params)
