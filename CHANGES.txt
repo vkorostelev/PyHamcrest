@@ -1,3 +1,6 @@
+=== Version 2.0 ==
+* [Feature] Add .eq proxy for matchers to test equality trivially
+
 === Version 1.8 ==
 
 * Supported versions

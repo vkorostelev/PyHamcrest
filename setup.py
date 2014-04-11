@@ -64,6 +64,6 @@ params = dict(
     **extra_attributes
     )
 
-from pprint import pprint; pprint(params['packages']); sys.exit(0)
 all_params = dict(params.items(), **extra_attributes)
-setup(**all_params)
+if __name__ == '__main__':
+    setup(**all_params)

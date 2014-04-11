@@ -54,8 +54,26 @@ class Matcher(SelfDescribing):
 
     @property
     def eq(self):
-        """Return a proxy for this matcher that implemens equality checking for
-        objects"""
+        """Return a proxy for this matcher that implements equality checking for
+        objects
+        
+        >>> class MatcherClass(Matcher):
+        ...    def matches(self, obj, *a):
+        ...        return obj == '1'
+        
+        >>> m = MatcherClass()
+        >>> m.matches('1')
+        True
+        >>> m.eq == '1'
+        True
+        >>> m.matches(1)
+        False
+        >>> m.eq == 1
+        False
+        >>> m.eq != 1
+        True
+
+        """
         class Proxy(self.__class__):
             def __init__(ps):
                 ps.matcher = self
