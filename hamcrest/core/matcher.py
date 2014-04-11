@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 from .selfdescribing import SelfDescribing
+from .string_description import tostring
 
 __author__ = "Jon Reid"
 __copyright__ = "Copyright 2011 hamcrest.org"
@@ -50,3 +51,26 @@ class Matcher(SelfDescribing):
 
         """
         raise NotImplementedError('describe_mismatch')
+
+    @property
+    def eq(self):
+        """Return a proxy for this matcher that implemens equality checking for
+        objects"""
+        class Proxy(self.__class__):
+            def __init__(ps):
+                ps.matcher = self
+                
+            def __eq__(ps, object):
+                return ps.matcher.matches(object)
+
+            def __ne__(ps, object):
+                return not ps.matcher.matches(object)
+
+            def __str__(ps):
+                return repr(ps.matcher)
+
+            def __repr__(ps):
+                return tostring(ps.matcher)
+        Proxy.__name__ = '{0}Equality'.format(self.__class__.__name__)
+        proxy = Proxy()
+        return proxy
