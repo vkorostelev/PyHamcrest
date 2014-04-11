@@ -16,3 +16,6 @@ class SelfDescribing(object):
 
         """
         raise NotImplementedError('describe_to')
+
+    def __str__(self):
+        return str(StringDescription().append_description_of(self))
