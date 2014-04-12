@@ -9,6 +9,8 @@ except ImportError:
     use_setuptools()
     from setuptools import setup, find_packages
 
+from setuptools.command.test import test as TestCommand
+
 def local(fname):
     return os.path.join(os.path.dirname(__file__), fname)
 
@@ -28,6 +30,20 @@ finally:
 
 extra_attributes = {}
 
+import sys
+
+class Tox(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import tox
+        errno = tox.cmdline(self.test_args)
+        sys.exit(errno)
+        
+
 params = dict(
     name='PyHamcrest',
     version=__version__,  #flake8:noqa
@@ -44,6 +60,8 @@ params = dict(
     provides=['hamcrest'],
     long_description=read('README.rst'),
     install_requires=['setuptools', 'six'],
+    tests_require=['tox>=1.6'],
+    cmdclass = {'test': Tox},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
